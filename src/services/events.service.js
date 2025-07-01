@@ -1,15 +1,15 @@
-import axios from 'axios';
+import axios from "axios";
 
 class EventsService {
   constructor() {
     this.api = axios.create({
-      baseURL: import.meta.env.SERVER_URL || 'http://localhost:5005'
+      baseURL: import.meta.env.SERVER_URL || "http://localhost:5005",
     });
 
     // Automatically set JWT token in the headers for every request
-    this.api.interceptors.request.use(config => {
+    this.api.interceptors.request.use((config) => {
       // Retrieve the JWT token from the local storage
-      const storedToken = localStorage.getItem('authToken');
+      const storedToken = localStorage.getItem("authToken");
 
       if (storedToken) {
         config.headers = { Authorization: `Bearer ${storedToken}` };
@@ -20,17 +20,17 @@ class EventsService {
   }
 
   // POST /api/events
-createEvent = (formData) => {
-  return this.api.post('/api/events', formData);
-};
+  createEvent = (formData) => {
+    return this.api.post("/api/events", formData);
+  };
 
   // GET /api/events
   getAllEvents = () => {
-    return this.api.get('/api/events');
+    return this.api.get("/api/events");
   };
 
   // GET /api/events/:id
-  getEvent = id => {
+  getEvent = (id) => {
     return this.api.get(`/api/events/${id}`);
   };
 
@@ -40,7 +40,7 @@ createEvent = (formData) => {
   };
 
   // DELETE /api/events/:id
-  deleteEvent = id => {
+  deleteEvent = (id) => {
     return this.api.delete(`/api/events/${id}`);
   };
 }

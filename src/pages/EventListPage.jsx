@@ -3,6 +3,7 @@ import { AuthContext } from "../context/auth.context";
 import eventService from "./../services/events.service";
 import AddEvent from "../components/AddEvent";
 import EventCard from "../components/EventCard";
+import { Link } from "react-router-dom";
 
 function EventListPage() {
   const [events, setEvents] = useState([]);
@@ -34,11 +35,12 @@ function EventListPage() {
       </header>
 
       <section className="mb-8">
-        <AddEvent refreshEvents={()=> {
-
-          getAllEvents();
-          window.location.reload()
-        }} />
+        <AddEvent
+          refreshEvents={() => {
+            getAllEvents();
+            window.location.reload();
+          }}
+        />
       </section>
 
       <section className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
@@ -48,6 +50,13 @@ function EventListPage() {
           <p className="text-gray-500">No events available right now.</p>
         )}
       </section>
+
+      <div className="mt-8 text-center text-sm text-black">
+        <p>Made with ❤️ by MusicMeet Team</p>
+        <Link to="/about" className="underline">
+          Learn more about us
+        </Link>
+      </div>
     </div>
   );
 }

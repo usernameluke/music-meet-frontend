@@ -1,9 +1,10 @@
+import { Link } from "react-router-dom";
+
 function HomePage() {
   return (
     <div className="min-h-screen bg-[url(/background.png)] bg-cover bg-center h-screen">
       {/* Main Content */}
       <div className="flex-grow flex flex-col items-center justify-center px-6 text-center">
-
         <h1 className="text-4xl font-bold text-white mt-10 font-sans">
           MusicMeet
         </h1>
@@ -22,6 +23,12 @@ function HomePage() {
             Log In
           </button>
         </div>
+      </div>
+      <div className="mt-8 text-center text-sm text-white">
+        <p>Made with ❤️ by MusicMeet Team</p>
+        <Link to="/about" className="underline">
+          Learn more about us
+        </Link>
       </div>
     </div>
   );

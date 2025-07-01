@@ -3,10 +3,10 @@ import eventService from "./../services/events.service";
 import { Link, useParams } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
 
-function EventDetailsPage(props) {
+function EventDetailsPage() {
   const [event, setEvent] = useState(null);
   const { eventId } = useParams();
-  const { user, isLoading } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   const isOwner = user && event?.author && user._id === event.author._id;
 
@@ -41,7 +41,8 @@ function EventDetailsPage(props) {
                 <strong>Where it's going down:</strong> {event.location}
               </p>
               <p>
-                <strong>What the place looks like:</strong> <img src={event.imageUrl} alt="Venue" />
+                <strong>What the place looks like:</strong>{" "}
+                <img src={event.imageUrl} alt="Venue" />
               </p>
               <p>
                 <strong>What date it's happening (YYYY/MM/DD):</strong>{" "}
@@ -82,6 +83,12 @@ function EventDetailsPage(props) {
             </button>
           </Link>
         )}
+      </div>
+      <div className="mt-8 text-center text-sm text-black">
+        <p>Made with ❤️ by MusicMeet Team</p>
+        <Link to="/about" className="underline">
+          Learn more about us
+        </Link>
       </div>
     </div>
   );

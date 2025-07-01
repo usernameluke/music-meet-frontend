@@ -46,7 +46,7 @@ function AddEvent({ refreshEvents }) {
         setType("");
         setInstrumentsNeeded("");
         setGenres("");
-        
+
         setShowForm(false);
         refreshEvents();
       })
@@ -156,9 +156,7 @@ function AddEvent({ refreshEvents }) {
                     placeholder="6pm-12am"
                   />
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Compensation

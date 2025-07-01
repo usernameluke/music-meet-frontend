@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import eventService from "./../services/events.service";
 import { useNavigate, Link, useParams } from "react-router-dom";
 
-function EditEventPage(props) {
+function EditEventPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [eventTime, setEventTime] = useState("");
   const [compensation, setCompensation] = useState("");
@@ -25,6 +26,7 @@ function EditEventPage(props) {
         setTitle(oneEvent.title);
         setDescription(oneEvent.description);
         setLocation(oneEvent.location);
+        setImageUrl(oneEvent.imageUrl);
         setEventDate(oneEvent.eventDate);
         setEventTime(oneEvent.eventTime);
         setCompensation(oneEvent.compensation);
@@ -41,6 +43,7 @@ function EditEventPage(props) {
       title,
       description,
       location,
+      imageUrl,
       eventDate,
       eventTime,
       compensation,
@@ -50,7 +53,7 @@ function EditEventPage(props) {
     };
 
     // Send the token through the request "Authorization" Headers
-    eventService.updateEvent(eventId, requestBody).then((response) => {
+    eventService.updateEvent(eventId, requestBody).then(() => {
       navigate(`/events/${eventId}`);
     });
   };
@@ -117,6 +120,20 @@ function EditEventPage(props) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
+                Event Image
+              </label>
+              <input
+                type="file"
+                // value={imageUrl}
+                accept="image/*"
+                onChange={(e) => setImageUrl(e.target.files[0])}
+                className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+                placeholder="Upload a picture of the venue"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
                 Event Date
               </label>
               <input
@@ -126,9 +143,6 @@ function EditEventPage(props) {
                 className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
               />
             </div>
-          </div>
-
-          <div className="flex justify-center items-center">
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Event Time
@@ -227,6 +241,12 @@ function EditEventPage(props) {
             </button>
           </div>
         </form>
+      </div>
+      <div className="mt-8 text-center text-sm text-black">
+        <p>Made with ❤️ by MusicMeet Team</p>
+        <Link to="/about" className="underline">
+          Learn more about us
+        </Link>
       </div>
     </div>
   );

@@ -25,12 +25,10 @@ function LoginPage() {
           error.response?.data?.message || "Login failed";
         setErrorMessage(errorDescription);
       });
-
-
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-purple-100 flex items-center justify-center px-4 sm:px-6">
+    <div className="min-h-screen bg-gradient-to-b from-white to-purple-100 flex flex-col items-center justify-center px-4 sm:px-6">
       <div className="w-full max-w-md bg-white p-6 sm:p-8 rounded-2xl shadow-md">
         <h1 className="text-2xl sm:text-3xl font-bold text-purple-700 mb-6 text-center">
           Login
@@ -99,6 +97,13 @@ function LoginPage() {
             Sign Up
           </Link>
         </p>
+      </div>
+
+      <div className="mt-8 text-center text-sm text-black">
+        <p>Made with ❤️ by MusicMeet Team</p>
+        <Link to="/about" className="underline">
+          Learn more about us
+        </Link>
       </div>
     </div>
   );
