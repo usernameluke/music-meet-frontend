@@ -1,22 +1,36 @@
 import userService from "../services/users.service";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/auth.context";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function ProfilePage() {
   const [profileInfo, setProfileInfo] = useState({});
-
+  const navigate = useNavigate();
   const getProfile = () => {
     // Send the token through the request "Authorization" Headers
     userService
       .getProfile()
       .then((response) => {
-        console.log(response.data);
         const oneProfile = response.data;
-        const { instagram, youtube, website } = oneProfile;
         setProfileInfo(oneProfile);
         setBio(oneProfile.bio);
-        setSocialLinks( (prev) => ({ ...prev, instagram, youtube, website }));
+        setInstagram(oneProfile.instagram);
+        setYoutube(oneProfile.youtube);
+        setWebsite(oneProfile.website);
+        setInstruments(oneProfile.instruments);
+        setGenres(oneProfile.genres);
+        setExperienceLevel(oneProfile.experienceLevel);
+        setInBand(oneProfile.inBand);
+        setLookingFor(oneProfile.lookingFor);
+        setAvailability(oneProfile.availability);
+        setBandName(oneProfile.bandName);
+        setMembers(oneProfile.members);
+        setBandGenres(oneProfile.bandGenres);
+        setBandLookingFor(oneProfile.bandLookingFor);
+        setVenueName(oneProfile.venueName);
+        setAddress(oneProfile.address);
+        setCapacity(oneProfile.capacity);
+        setPersonalSite(oneProfile.personalSite);
       })
       .catch((error) => console.log(error));
   };
@@ -25,53 +39,34 @@ function ProfilePage() {
     getProfile();
   }, []);
 
-  const { user, setUser } = useContext(AuthContext);
-  const [isEditing, setIsEditing] = useState(true);
+  const { user, setUser, deleteUser } = useContext(AuthContext);
+  const [isEditing, setIsEditing] = useState(false);
 
   const [bio, setBio] = useState("");
-  const [socialLinks, setSocialLinks] = useState({
-    instagram: "",
-    youtube: "",
-    website: "",
-  });
-  const changeSocial = (e) => {
-    const { name, value } = e.target;
-    setSocialLinks((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
+  const [instagram, setInstagram] = useState("");
+  const [youtube, setYoutube] = useState("");
+  const [website, setWebsite] = useState("");
 
-  const [instruments, setInstruments] = useState(
-    profileInfo?.instruments || ""
-  );
-  const [genres, setGenres] = useState(profileInfo?.genres || "");
-  const [experienceLevel, setExperienceLevel] = useState(
-    profileInfo?.experienceLevel || ""
-  );
+  const [instruments, setInstruments] = useState("");
+  const [genres, setGenres] = useState("");
+  const [experienceLevel, setExperienceLevel] = useState("");
 
-  const [inBand, setInBand] = useState(
-    profileInfo?.inBand === undefined ? null : profileInfo.inBand
-  );
-  const [lookingFor, setLookingFor] = useState(profileInfo?.lookingFor || "");
-  const [availability, setAvailability] = useState(
-    profileInfo?.availability || ""
-  );
+  const [inBand, setInBand] = useState(null);
+  const [lookingFor, setLookingFor] = useState("");
+  const [availability, setAvailability] = useState("");
 
-  const [bandName, setBandName] = useState(profileInfo?.bandName || "");
-  const [members, setMembers] = useState(profileInfo?.members || "");
-  const [bandGenres, setBandGenres] = useState(profileInfo?.bandGenres || "");
-  const [bandLookingFor, setBandLookingFor] = useState(
-    profileInfo?.bandLookingFor || ""
-  );
+  const [bandName, setBandName] = useState("");
+  const [members, setMembers] = useState("");
+  const [bandGenres, setBandGenres] = useState("");
+  const [bandLookingFor, setBandLookingFor] = useState("");
 
-  const [venueName, setVenueName] = useState(profileInfo?.venueName || "");
-  const [address, setAddress] = useState(profileInfo?.address || "");
-  const [capacity, setCapacity] = useState(profileInfo?.capacity || "");
-  const [website, setWebsite] = useState(profileInfo?.website || "");
+  const [venueName, setVenueName] = useState("");
+  const [address, setAddress] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [personalSite, setPersonalSite] = useState("");
 
   const handleSave = () => {
-    const commonData = { bio, socialLinks };
+    const commonData = { bio, instagram, youtube, website };
     let roleData = {};
 
     if (user.role === "musician") {
@@ -79,7 +74,6 @@ function ProfilePage() {
         instruments,
         genres,
         experienceLevel,
-        // convert null to false if needed before sending
         inBand: inBand === null ? false : inBand,
         lookingFor,
         availability,
@@ -87,7 +81,7 @@ function ProfilePage() {
     } else if (user.role === "band") {
       roleData = { bandName, members, bandGenres, bandLookingFor };
     } else if (user.role === "venue") {
-      roleData = { venueName, address, capacity, website };
+      roleData = { venueName, address, capacity, personalSite };
     }
 
     const payload = { ...commonData, ...roleData };
@@ -105,8 +99,6 @@ function ProfilePage() {
         alert("Could not save profile data, please try again.");
       });
   };
-
-  //console.log("user:", user);
 
   if (!user) return null;
 
@@ -180,66 +172,71 @@ function ProfilePage() {
         </div>
 
         {/* Social Links */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Social Media / Website
-          </label>
-          {isEditing ? (
-            <div className="mt-1 w-full border rounded-md px-3 py-2 text-sm">
-              <label>Instagram</label>
-              <input value={socialLinks.instagram} onChange={changeSocial} />
 
-              <label>YouTube</label>
-              <input value={socialLinks.youtube} onChange={changeSocial} />
+        <label className="block text-sm font-medium text-gray-700 mb-0">
+          Instagram
+        </label>
 
-              <label>Website</label>
-              <input value={socialLinks.website} onChange={changeSocial} />
-            </div>
-          ) : (
-            <div className="mt-1 text-sm text-gray-800">
-              <>
-                <span className="font-bold">
-                  Instagram:{" "}
-                  {profileInfo?.socialLinks.instagram ? (
-                    profileInfo.socialLinks.instagram
-                  ) : (
-                    <span className="text-gray-400 italic">
-                      Not yet selected — why not add this?{" "}
-                    </span>
-                  )}
-                </span>
-                <br />
-              </>
+        {isEditing ? (
+          <input
+            value={instagram}
+            onChange={(e) => setInstagram(e.target.value)}
+            className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+          />
+        ) : (
+          <div className="mt-1 text-sm text-gray-800">
+            {profileInfo?.instagram ? (
+              profileInfo.instagram
+            ) : (
+              <label className="text-gray-400 italic">
+                Not yet selected — why not add this?{" "}
+              </label>
+            )}
+          </div>
+        )}
 
-              <>
-                <span className="font-bold">
-                  YouTube:{" "}
-                  {profileInfo?.socialLinks.youtube ? (
-                    profileInfo.socialLinks.youtube
-                  ) : (
-                    <span className="text-gray-400 italic">
-                      Not yet selected — why not add this?{" "}
-                    </span>
-                  )}
-                </span>
-                <br />
-              </>
-              <>
-                <span className="font-bold">
-                  WebSite:{" "}
-                  {profileInfo?.socialLinks.website ? (
-                    profileInfo.socialLinks.website
-                  ) : (
-                    <span className="text-gray-400 italic">
-                      Not yet selected — why not add this?{" "}
-                    </span>
-                  )}
-                </span>
-                <br />
-              </>
-            </div>
-          )}
-        </div>
+        <label className="block text-sm font-medium text-gray-700 mb-0">
+          YouTube
+        </label>
+        {isEditing ? (
+          <input
+            value={youtube}
+            onChange={(e) => setYoutube(e.target.value)}
+            className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+          />
+        ) : (
+          <div className="mt-1 text-sm text-gray-800">
+            {profileInfo?.youtube ? (
+              profileInfo.youtube
+            ) : (
+              <label className="text-gray-400 italic">
+                Not yet selected — why not add this?{" "}
+              </label>
+            )}
+          </div>
+        )}
+
+        <label className="block text-sm font-medium text-gray-700 mb-0">
+          Website
+        </label>
+        {isEditing ? (
+          <input
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+          />
+        ) : (
+          <div className="mt-1 text-sm text-gray-800">
+            {profileInfo?.website ? (
+              profileInfo.website
+            ) : (
+              <label className="text-gray-400 italic">
+                Not yet selected — why not add this?{" "}
+              </label>
+            )}
+          </div>
+        )}
+
         {/* Role-specific fields */}
         {user.role === "musician" && (
           <>
@@ -559,14 +556,14 @@ function ProfilePage() {
               </label>
               {isEditing ? (
                 <input
-                  value={website}
-                  onChange={(e) => setWebsite(e.target.value)}
+                  value={personalSite}
+                  onChange={(e) => setPersonalSite(e.target.value)}
                   className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
                 />
               ) : (
                 <div className="mt-1 text-sm text-gray-800">
-                  {profileInfo?.website ? (
-                    profileInfo.website
+                  {profileInfo?.personalSite ? (
+                    profileInfo.personalSite
                   ) : (
                     <label className="text-gray-400 italic">
                       Not yet selected — why not add this?{" "}
@@ -577,18 +574,24 @@ function ProfilePage() {
             </div>
           </>
         )}
-        <div className="pt-6 flex justify-end space-x-4">
+        <div className="pt-6 flex justify-evenly space-x-4">
+          <button
+            onClick={deleteUser}
+            className="w-40 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition"
+          >
+            Delete Profile
+          </button>
           {isEditing ? (
             <>
               <button
                 onClick={() => setIsEditing(false)}
-                className="px-4 py-2 border rounded-md text-sm hover:bg-gray-100"
+                className="w-40 text-black font-medium px-4 py-2 border rounded-md text-sm hover:bg-gray-100"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-purple-700 text-white rounded-md text-sm hover:bg-purple-800"
+                className="w-40 px-4 py-2 bg-purple-700 text-white rounded-md text-sm hover:bg-purple-800"
               >
                 Save
               </button>
@@ -596,7 +599,7 @@ function ProfilePage() {
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="px-4 py-2 bg-purple-700 text-white rounded-md text-sm hover:bg-purple-800"
+              className="w-40 px-4 py-2 bg-purple-700 text-white rounded-md text-sm hover:bg-purple-800"
             >
               Edit Profile
             </button>

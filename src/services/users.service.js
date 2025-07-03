@@ -28,6 +28,11 @@ class UsersService {
   getProfile = () => {
     return this.api.get("/users/profile");
   };
+
+    // DELETE /users/profile
+  deleteProfile = () => {
+    return this.api.delete("/users/profile");
+  };
 }
 
 // Create one instance object

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import authService from "../services/auth.service";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = React.createContext();
 
 function AuthProviderWrapper(props) {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -56,6 +56,31 @@ function AuthProviderWrapper(props) {
     authenticateUser();
   };
 
+  const deleteUser = async () => {
+    try {
+    const res = await authService.deleteUser();
+    console.log("res:", res);
+      setUser(null)
+      setIsLoggedIn(false)
+      navigate('/signup')
+
+    }
+    catch(error){
+      console.error('error:',error)
+    }
+
+   
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, [navigate]);
+
   useEffect(() => {
     // Run the function after the initial render,
     // after the components in the App render for the first time.
@@ -78,6 +103,7 @@ function AuthProviderWrapper(props) {
         storeToken,
         authenticateUser,
         logOutUser,
+        deleteUser,
       }}
     >
       {props.children}
