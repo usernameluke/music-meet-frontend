@@ -14,6 +14,7 @@ function AddEvent({ refreshEvents }) {
   const [type, setType] = useState("");
   const [instrumentsNeeded, setInstrumentsNeeded] = useState("");
   const [genres, setGenres] = useState("");
+  const [accomodation, setAccomodation] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -33,6 +34,10 @@ function AddEvent({ refreshEvents }) {
       formData.append("imageUrl", imageUrl);
     }
 
+    if (accomodation) {
+      formData.append("accomodation", accomodation);
+    }
+
     eventService
       .createEvent(formData)
       .then(() => {
@@ -46,6 +51,7 @@ function AddEvent({ refreshEvents }) {
         setType("");
         setInstrumentsNeeded("");
         setGenres("");
+        setAccomodation(null);
 
         setShowForm(false);
         refreshEvents();
@@ -87,6 +93,7 @@ function AddEvent({ refreshEvents }) {
                   onChange={(e) => setTitle(e.target.value)}
                   className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
                   placeholder="Open Mic Night @ The Underworld"
+                  required
                 />
               </div>
 
@@ -101,6 +108,7 @@ function AddEvent({ refreshEvents }) {
                   className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
                   rows="3"
                   placeholder="A chance for local talent to enjoy themselves, with 100 tickets already sold. 8.30pm-12am. All musicians/bands welcome!"
+                  required
                 />
               </div>
 
@@ -115,7 +123,8 @@ function AddEvent({ refreshEvents }) {
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
-                    placeholder="Camden, London"
+                    placeholder="Precise address"
+                    required
                   />
                 </div>
 
@@ -141,6 +150,7 @@ function AddEvent({ refreshEvents }) {
                     value={eventDate}
                     onChange={(e) => setEventDate(e.target.value)}
                     className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+                    required
                   />
                 </div>
 
@@ -154,6 +164,7 @@ function AddEvent({ refreshEvents }) {
                     onChange={(e) => setEventTime(e.target.value)}
                     className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
                     placeholder="6pm-12am"
+                    required
                   />
                 </div>
 
@@ -167,6 +178,7 @@ function AddEvent({ refreshEvents }) {
                     onChange={(e) => setCompensation(e.target.value)}
                     className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
                     placeholder="€10 worth of free drinks"
+                    required
                   />
                 </div>
 
@@ -214,7 +226,32 @@ function AddEvent({ refreshEvents }) {
                     onChange={(e) => setGenres(e.target.value)}
                     className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
                     placeholder="Blues, jazz, rock..."
+                    required
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Accomodation given?
+                  </label>
+                  <select
+                    required
+                    className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+                    value={
+                      typeof accomodation === "boolean"
+                        ? String(accomodation)
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "") setAccomodation(null);
+                      else setAccomodation(val === "true");
+                    }}
+                  >
+                    <option value="">Select...</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                  </select>
                 </div>
               </div>
 

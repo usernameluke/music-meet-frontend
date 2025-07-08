@@ -5,40 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 function ProfilePage() {
   const [profileInfo, setProfileInfo] = useState({});
+  const [allMusicians, setAllMusicians] = useState([]);
   const navigate = useNavigate();
-  const getProfile = () => {
-    // Send the token through the request "Authorization" Headers
-    userService
-      .getProfile()
-      .then((response) => {
-        const oneProfile = response.data;
-        setProfileInfo(oneProfile);
-        setBio(oneProfile.bio);
-        setInstagram(oneProfile.instagram);
-        setYoutube(oneProfile.youtube);
-        setWebsite(oneProfile.website);
-        setInstruments(oneProfile.instruments);
-        setGenres(oneProfile.genres);
-        setExperienceLevel(oneProfile.experienceLevel);
-        setInBand(oneProfile.inBand);
-        setLookingFor(oneProfile.lookingFor);
-        setAvailability(oneProfile.availability);
-        setBandName(oneProfile.bandName);
-        setMembers(oneProfile.members);
-        setBandGenres(oneProfile.bandGenres);
-        setBandLookingFor(oneProfile.bandLookingFor);
-        setVenueName(oneProfile.venueName);
-        setAddress(oneProfile.address);
-        setCapacity(oneProfile.capacity);
-        setPersonalSite(oneProfile.personalSite);
-      })
-      .catch((error) => console.log(error));
-  };
-
-  useEffect(() => {
-    getProfile();
-  }, []);
-
   const { user, setUser, deleteUser } = useContext(AuthContext);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -55,21 +23,72 @@ function ProfilePage() {
   const [lookingFor, setLookingFor] = useState("");
   const [availability, setAvailability] = useState("");
 
-  const [bandName, setBandName] = useState("");
-  const [members, setMembers] = useState("");
+  const [members, setMembers] = useState([]);
   const [bandGenres, setBandGenres] = useState("");
   const [bandLookingFor, setBandLookingFor] = useState("");
 
-  const [venueName, setVenueName] = useState("");
   const [address, setAddress] = useState("");
+  const [pay, setPay] = useState("");
+  const [lodging, setLodging] = useState(null);
   const [capacity, setCapacity] = useState("");
-  const [personalSite, setPersonalSite] = useState("");
+
+  const getProfile = (musiciansList = allMusicians) => {
+    userService
+      .getProfile()
+      .then((response) => {
+        const oneProfile = response.data;
+
+        // Turn member IDs into full objects
+        const completeMembers =
+          oneProfile.members?.map((IdOrObject) => {
+            if (typeof IdOrObject === "object") return IdOrObject;
+            return musiciansList.find((m) => m._id === IdOrObject);
+          }) || [];
+
+        setProfileInfo({
+          ...oneProfile,
+          members: completeMembers,
+        });
+
+        // Set state values
+        setBio(oneProfile.bio || "");
+        setInstagram(oneProfile.instagram || "");
+        setYoutube(oneProfile.youtube || "");
+        setWebsite(oneProfile.website || "");
+        setInstruments(oneProfile.instruments || "");
+        setGenres(oneProfile.genres || "");
+        setExperienceLevel(oneProfile.experienceLevel || "");
+        setInBand(oneProfile.inBand ?? null);
+        setLookingFor(oneProfile.lookingFor || "");
+        setAvailability(oneProfile.availability || "");
+        setMembers(completeMembers.map((m) => m?._id));
+        setBandGenres(oneProfile.bandGenres || "");
+        setBandLookingFor(oneProfile.bandLookingFor || "");
+        setAddress(oneProfile.address || "");
+        setPay(oneProfile.pay || "");
+        setLodging(oneProfile.lodging ?? null);
+        setCapacity(oneProfile.capacity || "");
+      })
+      .catch((error) => console.log(error));
+  };
+
+  useEffect(() => {
+    userService.getAllMusicians().then((res) => {
+      setAllMusicians(res.data);
+      getProfile(res.data);
+    });
+  }, []);
 
   const handleSave = () => {
     const commonData = { bio, instagram, youtube, website };
     let roleData = {};
 
     if (user.role === "musician") {
+      if (!genres.trim()) {
+        alert("Please enter at least one genre.");
+        return;
+      }
+
       roleData = {
         instruments,
         genres,
@@ -79,9 +98,40 @@ function ProfilePage() {
         availability,
       };
     } else if (user.role === "band") {
-      roleData = { bandName, members, bandGenres, bandLookingFor };
+      if (!bandGenres.trim()) {
+        alert("Please enter at least one genre.");
+        return;
+      }
+
+      const cleanedMembers = Array.isArray(members)
+        ? members.filter((m) => m && m !== "null")
+        : [];
+
+      roleData = {
+        members: cleanedMembers,
+        bandGenres,
+        bandLookingFor,
+      };
     } else if (user.role === "venue") {
-      roleData = { venueName, address, capacity, personalSite };
+      if (!address.trim()) {
+        alert("Please enter the venue's address.");
+        return;
+      }
+      if (!pay.trim()) {
+        alert("Please enter the payment information.");
+        return;
+      }
+      if (lodging === null) {
+        alert("Please specify if lodging is available.");
+        return;
+      }
+
+      roleData = {
+        address,
+        pay,
+        lodging: lodging === null ? false : lodging,
+        capacity,
+      };
     }
 
     const payload = { ...commonData, ...roleData };
@@ -90,7 +140,6 @@ function ProfilePage() {
       .updateProfile(payload)
       .then((response) => {
         setUser(response.data);
-
         getProfile();
         setIsEditing(false);
       })
@@ -317,7 +366,7 @@ function ProfilePage() {
               </label>
               {isEditing ? (
                 <select
-                  value={inBand === null ? "" : inBand.toString()}
+                  value={typeof inBand === "boolean" ? String(inBand) : ""}
                   onChange={(e) => {
                     const val = e.target.value;
                     if (val === "") setInBand(null);
@@ -391,50 +440,59 @@ function ProfilePage() {
         )}
         {user.role === "band" && (
           <>
-            <div>
+            <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700">
-                Band Name
+                Band Members
               </label>
               {isEditing ? (
-                <input
-                  value={bandName}
-                  onChange={(e) => setBandName(e.target.value)}
-                  className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
-                />
-              ) : (
-                <div className="mt-1 text-sm text-gray-800">
-                  {profileInfo?.bandName ? (
-                    profileInfo.bandName
-                  ) : (
-                    <label className="text-gray-400 italic">
-                      Not yet selected — why not add this?{" "}
+                <div className="mt-2 space-y-1">
+                  {allMusicians.map((musician) => (
+                    <label
+                      key={musician._id}
+                      className="flex items-center space-x-2 text-sm"
+                    >
+                      <input
+                        type="checkbox"
+                        value={musician._id}
+                        checked={members.includes(musician._id)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setMembers((prev) =>
+                            e.target.checked
+                              ? [...prev, value]
+                              : prev.filter((id) => id !== value)
+                          );
+                        }}
+                        className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                      />
+                      <span>{musician.name}</span>
                     </label>
-                  )}
+                  ))}
                 </div>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Members
-              </label>
-              {isEditing ? (
-                <input
-                  value={members}
-                  onChange={(e) => setMembers(e.target.value)}
-                  className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
-                />
               ) : (
                 <div className="mt-1 text-sm text-gray-800">
-                  {profileInfo?.members ? (
+                  {profileInfo.members && profileInfo.members.length > 0 ? (
                     profileInfo.members
+                      .filter((m) => m && m.name)
+                      .map((m) => (
+                        <div key={m._id}>
+                          <Link
+                            to={`/users/${m._id}`}
+                            className="text-blue-600 underline hover:text-blue-800"
+                          >
+                            {m.name}
+                          </Link>
+                        </div>
+                      ))
                   ) : (
                     <label className="text-gray-400 italic">
-                      Not yet selected — why not add this?{" "}
+                      Not yet selected — why not add this?
                     </label>
                   )}
                 </div>
               )}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Genres
@@ -485,28 +543,6 @@ function ProfilePage() {
           <>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Venue Name
-              </label>
-              {isEditing ? (
-                <input
-                  value={venueName}
-                  onChange={(e) => setVenueName(e.target.value)}
-                  className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
-                />
-              ) : (
-                <div className="mt-1 text-sm text-gray-800">
-                  {profileInfo?.venueName ? (
-                    profileInfo.venueName
-                  ) : (
-                    <label className="text-gray-400 italic">
-                      Not yet selected — why not add this?{" "}
-                    </label>
-                  )}
-                </div>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
                 Address
               </label>
               {isEditing ? (
@@ -514,6 +550,7 @@ function ProfilePage() {
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+                  required
                 />
               ) : (
                 <div className="mt-1 text-sm text-gray-800">
@@ -527,9 +564,67 @@ function ProfilePage() {
                 </div>
               )}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Capacity
+                How much do you pay and what for?
+              </label>
+              {isEditing ? (
+                <input
+                  value={pay}
+                  onChange={(e) => setPay(e.target.value)}
+                  className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+                  required
+                />
+              ) : (
+                <div className="mt-1 text-sm text-gray-800">
+                  {profileInfo?.pay ? (
+                    profileInfo.pay
+                  ) : (
+                    <label className="text-gray-400 italic">
+                      Not yet selected — why not add this?{" "}
+                    </label>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Do you give lodging?
+              </label>
+              {isEditing ? (
+                <select
+                  value={typeof lodging === "boolean" ? String(lodging) : ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "") setLodging(null);
+                    else setLodging(val === "true");
+                  }}
+                  className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+                >
+                  <option value="">Select...</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+              ) : (
+                <div className="mt-1 text-sm text-gray-800">
+                  {lodging === null ? (
+                    <span className="text-gray-400 italic">
+                      Not yet selected — why not add this?
+                    </span>
+                  ) : lodging ? (
+                    "Yes"
+                  ) : (
+                    "No"
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                What's your max capacity?
               </label>
               {isEditing ? (
                 <input
@@ -542,28 +637,6 @@ function ProfilePage() {
                 <div className="mt-1 text-sm text-gray-800">
                   {profileInfo?.capacity ? (
                     profileInfo.capacity
-                  ) : (
-                    <label className="text-gray-400 italic">
-                      Not yet selected — why not add this?{" "}
-                    </label>
-                  )}
-                </div>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Website
-              </label>
-              {isEditing ? (
-                <input
-                  value={personalSite}
-                  onChange={(e) => setPersonalSite(e.target.value)}
-                  className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
-                />
-              ) : (
-                <div className="mt-1 text-sm text-gray-800">
-                  {profileInfo?.personalSite ? (
-                    profileInfo.personalSite
                   ) : (
                     <label className="text-gray-400 italic">
                       Not yet selected — why not add this?{" "}

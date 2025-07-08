@@ -8,6 +8,9 @@ import { AuthContext } from "./context/auth.context";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
+import ViewProfilePage from "./pages/ViewProfilePage"
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 import IsPrivate from "./components/IsPrivate";
 import IsAnon from "./components/IsAnon";
 import { useContext } from "react";
@@ -24,6 +27,10 @@ function App() {
         <>
           <Routes>
             <Route path="/" element={<HomePage />} />
+
+            <Route path="/about" element={<AboutPage />} />
+
+            <Route path="/contact" element={<ContactPage />} />
 
             <Route
               path="/signup"
@@ -42,6 +49,15 @@ function App() {
                   {" "}
                   <LoginPage />{" "}
                 </IsAnon>
+              }
+            />
+
+            <Route
+              path="/users/:userId"
+              element={
+                <IsPrivate>
+                  <ViewProfilePage />
+                </IsPrivate>
               }
             />
 

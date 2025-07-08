@@ -29,6 +29,16 @@ class UsersService {
     return this.api.get("/users/profile");
   };
 
+  // GET
+  getAllMusicians = () => {
+    return this.api.get("/users?role=musician");
+  };
+
+  //GET specific profile /users/${userId}
+  getPublicProfile = (userId) => {
+  return this.api.get(`/users/${userId}`);
+};
+
     // DELETE /users/profile
   deleteProfile = () => {
     return this.api.delete("/users/profile");

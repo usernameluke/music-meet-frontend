@@ -13,6 +13,7 @@ function EditEventPage() {
   const [type, setType] = useState("");
   const [instrumentsNeeded, setInstrumentsNeeded] = useState("");
   const [genres, setGenres] = useState("");
+  const [accomodation, setAccomodation] = useState(null);
 
   const navigate = useNavigate();
   const { eventId } = useParams();
@@ -33,6 +34,7 @@ function EditEventPage() {
         setType(oneEvent.type);
         setInstrumentsNeeded(oneEvent.instrumentsNeeded);
         setGenres(oneEvent.genres);
+        setAccomodation(oneEvent.accomodation);
       })
       .catch((error) => console.log(error));
   }, [eventId]);
@@ -50,6 +52,7 @@ function EditEventPage() {
       type,
       instrumentsNeeded,
       genres,
+      accomodation,
     };
 
     // Send the token through the request "Authorization" Headers
@@ -216,6 +219,28 @@ function EditEventPage() {
                 className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
                 placeholder="Blues, jazz, rock..."
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Accomodation given?
+              </label>
+              <select
+                required
+                className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+                value={
+                  typeof accomodation === "boolean" ? String(accomodation) : ""
+                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "") setAccomodation(null);
+                  else setAccomodation(val === "true");
+                }}
+              >
+                <option value="">Select...</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
             </div>
           </div>
 

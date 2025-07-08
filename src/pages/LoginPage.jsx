@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../context/auth.context";
 
 function LoginPage() {
-  const [email, setEmail] = useState("musician@email.com");
-  const [password, setPassword] = useState("Abc123!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(undefined);
 
   const { storeToken, authenticateUser } = useContext(AuthContext);

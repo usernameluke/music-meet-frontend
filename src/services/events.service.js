@@ -6,7 +6,7 @@ class EventsService {
       baseURL: import.meta.env.SERVER_URL || "http://localhost:5005",
     });
 
-    // Automatically set JWT token in the headers for every request
+    // Automatically attach JWT token to each request
     this.api.interceptors.request.use((config) => {
       // Retrieve the JWT token from the local storage
       const storedToken = localStorage.getItem("authToken");
