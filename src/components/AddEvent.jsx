@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import eventService from "../services/events.service";
 
 function AddEvent({ refreshEvents }) {
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
 
   const [title, setTitle] = useState("");
@@ -40,7 +42,7 @@ function AddEvent({ refreshEvents }) {
 
     eventService
       .createEvent(formData)
-      .then(() => {
+      .then((createdEvent) => {
         setTitle("");
         setDescription("");
         setLocation("");
@@ -53,8 +55,9 @@ function AddEvent({ refreshEvents }) {
         setGenres("");
         setAccomodation(null);
 
-        setShowForm(false);
         refreshEvents();
+        setShowForm(false);
+        navigate(`/events/${createdEvent._id}`);
       })
       .catch((error) => console.log(error));
   };
