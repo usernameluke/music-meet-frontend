@@ -22,7 +22,11 @@ function App() {
       <Navbar />
 
       {isLoading ? (
-        <div>LOADING .......!!!!!!!</div>
+        <div className="flex justify-centre align-centre">
+          <p className="font-bold text-lg text-purple-900">
+            Your call is important to us. Please, hold the line while we put you through...
+          </p>
+        </div>
       ) : (
         <>
           <Routes>
