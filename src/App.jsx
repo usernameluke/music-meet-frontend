@@ -14,6 +14,7 @@ import ContactPage from "./pages/ContactPage";
 import IsPrivate from "./components/IsPrivate";
 import IsAnon from "./components/IsAnon";
 import { useContext } from "react";
+import ErrorPage from "./pages/ErrorPage";
 
 function App() {
   const { isLoading } = useContext(AuthContext);
@@ -101,6 +102,13 @@ function App() {
                   {" "}
                   <EditEventPage />{" "}
                 </IsPrivate>
+              }
+            />
+
+            <Route
+              path="*" 
+              element={
+                <ErrorPage/>
               }
             />
           </Routes>
